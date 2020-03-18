@@ -20,7 +20,7 @@ public class CustomerService {
 	public Customer save(CustomerDTO customerDTO) {
 
 		RestTemplate client = new RestTemplate();
-		ResponseEntity<CityDTO> response = client.exchange("http://localhost:8081/cities?name=" + customerDTO.getCity(),
+		ResponseEntity<CityDTO> response = client.exchange("http://city/cities?name=" + customerDTO.getCity(),
 				HttpMethod.GET, null, CityDTO.class);
 
 		// TODO: Validar se é uma cidade válida.

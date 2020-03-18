@@ -1,0 +1,11 @@
+
+server:
+  # porta padrão do eureka.
+  port: 8761
+
+eureka:
+  client:
+    # configura para o serviço não se registrar no eureka, pois ele que é o server.
+    register-with-eureka: false
+    # e também não vai guardar informações de outras aplicações, cache, etc.
+    fetch-registry: false
