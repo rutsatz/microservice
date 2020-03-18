@@ -4,6 +4,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.PrePersist;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -27,5 +28,13 @@ public class City {
 	private String name;
 
 	private String state;
+
+	/**
+	 * Ensures that the state will always be saved in capital letters.
+	 */
+	@PrePersist
+	private void prePersist() {
+		this.state = this.state.toUpperCase();
+	}
 
 }

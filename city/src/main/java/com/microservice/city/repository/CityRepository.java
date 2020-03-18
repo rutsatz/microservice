@@ -11,8 +11,8 @@ import com.microservice.city.model.City;
 @Repository
 public interface CityRepository extends CrudRepository<City, Long> {
 
-	public Optional<City> findByName(String name);
+	public Optional<City> findByNameIgnoreCase(String name);
 
-	public Optional<List<City>> findByState(String state);
+	public Optional<List<City>> findByStateIgnoreCase(String state);
 
 }
