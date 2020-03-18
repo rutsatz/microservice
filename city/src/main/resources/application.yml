@@ -1,0 +1,19 @@
+
+server:
+  port: 8081
+  
+spring:
+  jpa:
+    database: postgresql
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+  datasource:
+    url: jdbc:postgresql://localhost/city?useSSL=false
+    username: postgres
+    password: postgres
+    
+  jackson:
+    deserialization:
+      fail-on-unknown-properties: true
+    
