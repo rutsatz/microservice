@@ -17,9 +17,11 @@ public class CustomerService {
 	@Autowired
 	private CustomerRepository customerRepository;
 
+	@Autowired
+	private RestTemplate client;
+
 	public Customer save(CustomerDTO customerDTO) {
 
-		RestTemplate client = new RestTemplate();
 		ResponseEntity<CityDTO> response = client.exchange("http://city/cities?name=" + customerDTO.getCity(),
 				HttpMethod.GET, null, CityDTO.class);
 
