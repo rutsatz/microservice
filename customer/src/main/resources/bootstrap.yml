@@ -1,0 +1,11 @@
+# Esse arquivo de bootstrap é lido num contexto anterior do start da aplicação
+# permitindo baixar as confs do spring server, antes de inicializar o banco, por exemplo.
+spring:
+  application:
+    name: 'customer'
+  profiles:
+    active: default
+  cloud:
+    config:
+      # Url do server config, para baixar as confs do profile ativo.
+      uri: http://localhost:8888
