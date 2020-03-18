@@ -2,6 +2,8 @@ package com.microservice.customer.controller.dto;
 
 import java.time.LocalDate;
 
+import com.microservice.customer.model.Gender;
+
 import lombok.Data;
 
 @Data
@@ -12,7 +14,7 @@ public class CustomerDTO {
 	 */
 	private String name;
 
-//	private Gender gender;
+	private Gender gender;
 
 	/**
 	 * Date of birth.
