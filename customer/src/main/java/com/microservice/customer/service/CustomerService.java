@@ -2,6 +2,9 @@ package com.microservice.customer.service;
 
 import java.util.Optional;
 
+import javax.validation.Valid;
+
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
@@ -46,6 +49,18 @@ public class CustomerService {
 	}
 
 	/**
+	 * Updates the customer's name.
+	 *
+	 * @param id of the customer.
+	 * @param name of the customer.
+	 */
+	public void updateName(Long id, String name) {
+		Customer savedCustomer = getById(id);
+		savedCustomer.setName(name);
+		customerRepository.save(savedCustomer);
+	}
+
+	/**
 	 * Search for customer in the database by name.
 	 *
 	 * @param name of the customer.
@@ -66,4 +81,5 @@ public class CustomerService {
 		return customerRepository.findById(id)
 				.orElseThrow(() -> new EmptyResultDataAccessException("No customers found with this id.", 1));
 	}
+
 }
