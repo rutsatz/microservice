@@ -26,6 +26,7 @@ import com.microservice.customer.exceptionhandler.CustomerExceptionHandler.Error
 import com.microservice.customer.model.Customer;
 import com.microservice.customer.repository.CustomerRepository;
 import com.microservice.customer.service.CustomerService;
+import com.microservice.customer.service.exception.CityNotFoundException;
 import com.microservice.customer.service.exception.CustomerAlreadyExistsException;
 
 import io.swagger.annotations.Api;
@@ -121,6 +122,20 @@ public class CustomerController {
 	@ExceptionHandler({ CustomerAlreadyExistsException.class })
 	public ResponseEntity<Object> handleCustomerAlreadyExistsException(CustomerAlreadyExistsException ex) {
 		String userMessage = "There is already a registered customer with this name.";
+		String developerMessage = ex.toString();
+		List<Error> errors = Arrays.asList(new Error(userMessage, developerMessage));
+		return ResponseEntity.badRequest().body(errors);
+	}
+
+	/**
+	 * Handle the exception when the customer is registered with an invalid city.
+	 *
+	 * @param ex Exception that was thrown.
+	 * @return Response to be sent to the user.
+	 */
+	@ExceptionHandler({ CityNotFoundException.class })
+	public ResponseEntity<Object> handleCityNotFoundException(CityNotFoundException ex) {
+		String userMessage = "No cities found with that name.";
 		String developerMessage = ex.toString();
 		List<Error> errors = Arrays.asList(new Error(userMessage, developerMessage));
 		return ResponseEntity.badRequest().body(errors);

@@ -2,17 +2,19 @@ package com.microservice.customer.service;
 
 import java.util.Optional;
 
-import javax.validation.Valid;
-
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import com.microservice.customer.client.CityClient;
 import com.microservice.customer.controller.dto.CustomerDTO;
 import com.microservice.customer.model.Customer;
 import com.microservice.customer.repository.CustomerRepository;
+import com.microservice.customer.service.exception.CityNotFoundException;
 import com.microservice.customer.service.exception.CustomerAlreadyExistsException;
+
+import feign.FeignException;
 
 @Service
 public class CustomerService {
@@ -20,22 +22,25 @@ public class CustomerService {
 	@Autowired
 	private CustomerRepository customerRepository;
 
-	public Customer save(CustomerDTO customerDTO) {
+	@Autowired
+	private CityClient cityClient;
 
-//		try {
-//		ResponseEntity<CityDTO> response = client.exchange("http://city/api/v1/cities?name=" + customerDTO.getCity(),
-//				HttpMethod.GET, null, CityDTO.class);
-//		}catch (RestClientException e) {
-//			e.printStackTrace();
-//		}
-//		// TODO: Verificar se é uma cidade válida.
-//		CityDTO cityDTO = response.getBody();
-//		System.out.println("cityDTO " + cityDTO);
+	public Customer save(CustomerDTO customerDTO) {
 
 		// Validate that the city does not exist before registering.
 		Optional<Customer> customerOptional = customerRepository.findByNameIgnoreCase(customerDTO.getName());
 		if (customerOptional.isPresent()) {
 			throw new CustomerAlreadyExistsException();
+		}
+
+		try {
+			// Validates that the customer's city is a valid city.
+			cityClient.findByName(customerDTO.getCity());
+		} catch (FeignException e) {
+			if (e.status() == HttpStatus.NOT_FOUND.value()) {
+				throw new CityNotFoundException();
+			}
+			throw e;
 		}
 
 		Customer customer = Customer.builder()
