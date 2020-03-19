@@ -6,6 +6,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.PrePersist;
 
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -18,15 +20,19 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@ApiModel(description = "All details about the city")
 public class City {
 
+	@ApiModelProperty(value = "Unique city identifier", example = "123")
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@EqualsAndHashCode.Include
 	private Long id;
 
+	@ApiModelProperty(value = "City's name", example = "Santa Cruz do Sul")
 	private String name;
 
+	@ApiModelProperty(value = "State of the city", example = "RS")
 	private String state;
 
 	/**

@@ -7,6 +7,7 @@ import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,6 +23,11 @@ import com.microservice.city.model.City;
 import com.microservice.city.service.CityService;
 import com.microservice.city.service.exception.CityAlreadyExistsException;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -33,13 +39,20 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @RestController
 @RequestMapping("/api/v1/cities")
+@Api(value = "City", tags = "City")
 public class CityController {
 
 	@Autowired
 	private CityService cityService;
 
-	@GetMapping(params = "name")
-	public CityDTO findByName(@RequestParam String name) {
+	@ApiOperation(value = "Search city by name.", response = CityDTO.class)
+	@ApiResponses(value = {
+			@ApiResponse(code = 400, message = "Invalid Request"),
+			@ApiResponse(code = 500, message = "Internal Server Error")
+	})
+	@GetMapping(params = "name", produces = MediaType.APPLICATION_JSON_VALUE)
+	public CityDTO findByName(
+			@ApiParam(value = "City's name", required = true) @RequestParam(required = true) String name) {
 		City city = cityService.getByName(name);
 		return CityDTO.builder()
 				.name(city.getName())
@@ -47,13 +60,24 @@ public class CityController {
 				.build();
 	}
 
-	@GetMapping(params = "state")
-	public List<City> findByState(@RequestParam String state) {
+	@ApiOperation(value = "Search the cities of the state.")
+	@ApiResponses(value = {
+			@ApiResponse(code = 400, message = "Invalid Request"),
+			@ApiResponse(code = 500, message = "Internal Server Error")
+	})
+	@GetMapping(params = "state", produces = MediaType.APPLICATION_JSON_VALUE)
+	public List<City> findByState(
+			@ApiParam(value = "State you want to look for", required = true) @RequestParam(required = true) String state) {
 		return cityService.getByState(state);
 	}
 
-	@PostMapping
-	public ResponseEntity<City> create(@Valid @RequestBody CityDTO cityDTO) {
+	@ApiOperation(value = "Register a new city.")
+	@ApiResponses(value = {
+			@ApiResponse(code = 400, message = "Invalid Request"),
+			@ApiResponse(code = 500, message = "Internal Server Error")
+	})
+	@PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<City> create(@ApiParam(value = "City data") @Valid @RequestBody CityDTO cityDTO) {
 		log.info("Registering a new city: {}", cityDTO);
 		City savedCity = cityService.save(cityDTO);
 		return ResponseEntity.status(HttpStatus.CREATED).body(savedCity);
