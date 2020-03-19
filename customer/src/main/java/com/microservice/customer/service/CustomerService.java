@@ -1,15 +1,15 @@
 package com.microservice.customer.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
+import java.util.Optional;
 
-import com.microservice.customer.controller.dto.CityDTO;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.stereotype.Service;
+
 import com.microservice.customer.controller.dto.CustomerDTO;
 import com.microservice.customer.model.Customer;
 import com.microservice.customer.repository.CustomerRepository;
+import com.microservice.customer.service.exception.CustomerAlreadyExistsException;
 
 @Service
 public class CustomerService {
@@ -17,16 +17,23 @@ public class CustomerService {
 	@Autowired
 	private CustomerRepository customerRepository;
 
-	@Autowired
-	private RestTemplate client;
-
 	public Customer save(CustomerDTO customerDTO) {
 
-		ResponseEntity<CityDTO> response = client.exchange("http://city/cities?name=" + customerDTO.getCity(),
-				HttpMethod.GET, null, CityDTO.class);
+//		try {
+//		ResponseEntity<CityDTO> response = client.exchange("http://city/api/v1/cities?name=" + customerDTO.getCity(),
+//				HttpMethod.GET, null, CityDTO.class);
+//		}catch (RestClientException e) {
+//			e.printStackTrace();
+//		}
+//		// TODO: Verificar se é uma cidade válida.
+//		CityDTO cityDTO = response.getBody();
+//		System.out.println("cityDTO " + cityDTO);
 
-		// TODO: Validar se é uma cidade válida.
-		CityDTO cityDTO = response.getBody();
+		// Validate that the city does not exist before registering.
+		Optional<Customer> customerOptional = customerRepository.findByNameIgnoreCase(customerDTO.getName());
+		if (customerOptional.isPresent()) {
+			throw new CustomerAlreadyExistsException();
+		}
 
 		Customer customer = Customer.builder()
 				.name(customerDTO.getName())
@@ -38,4 +45,25 @@ public class CustomerService {
 		return customerRepository.save(customer);
 	}
 
+	/**
+	 * Search for customer in the database by name.
+	 *
+	 * @param name of the customer.
+	 * @return the customer.
+	 */
+	public Customer getByName(String name) {
+		return customerRepository.findByNameIgnoreCase(name)
+				.orElseThrow(() -> new EmptyResultDataAccessException("No customers found with this name.", 1));
+	}
+
+	/**
+	 * Search for a customer by id.
+	 *
+	 * @param id of the customer.
+	 * @return the customer.
+	 */
+	public Customer getById(Long id) {
+		return customerRepository.findById(id)
+				.orElseThrow(() -> new EmptyResultDataAccessException("No customers found with this id.", 1));
+	}
 }
